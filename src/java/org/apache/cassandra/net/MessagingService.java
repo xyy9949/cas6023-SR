@@ -19,7 +19,6 @@ package org.apache.cassandra.net;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import edu.uchicago.cs.ucare.dmck.interceptor.InterceptionLayer;
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.net.*;
@@ -55,6 +54,7 @@ import org.apache.cassandra.security.SSLFactory;
 import org.apache.cassandra.service.*;
 import org.apache.cassandra.service.paxos.Commit;
 import org.apache.cassandra.service.paxos.PrepareResponse;
+import org.apache.cassandra.testing.TestingClient;
 import org.apache.cassandra.tracing.TraceState;
 import org.apache.cassandra.tracing.Tracing;
 import org.apache.cassandra.utils.*;
@@ -169,6 +169,7 @@ public final class MessagingService implements MessagingServiceMBean {
           put(Verb.SNAPSHOT, Stage.MISC);
 
           put(Verb.TREE_REQUEST, Stage.ANTI_ENTROPY);
+          put(Verb.TREE_REQUEST, Stage.ANTI_ENTROPY);
           put(Verb.TREE_RESPONSE, Stage.ANTI_ENTROPY);
           put(Verb.STREAMING_REPAIR_REQUEST, Stage.ANTI_ENTROPY);
           put(Verb.STREAMING_REPAIR_RESPONSE, Stage.ANTI_ENTROPY);
@@ -193,6 +194,25 @@ public final class MessagingService implements MessagingServiceMBean {
           put(Verb.UNUSED_3, Stage.INTERNAL_RESPONSE);
         }
       };
+
+
+  private Thread testingThread;
+  private TestingClient tc; //later use: tc.writeToSocket(....);
+
+  //BURCU
+  public void connectToTestServer() {
+    //tc = new TestingClient("127.0.0.1", 4444);
+
+    tc = TestingClient.getInstance();
+
+    testingThread = new Thread(new Runnable() {
+      @Override
+      public void run() {
+        tc.connect();
+      }
+    });
+    testingThread.start();
+  }
 
   /**
    * Messages we receive in IncomingTcpConnection have a Verb that tells us what kind of message it
@@ -357,10 +377,14 @@ public final class MessagingService implements MessagingServiceMBean {
   }
 
   public static MessagingService instance() {
+    //logger.info("---Returning instance");
     return MSHandle.instance;
   }
 
   private MessagingService() {
+
+    connectToTestServer();
+
     for (Verb verb : DROPPABLE_VERBS) {
       droppedMessages.put(verb, new DroppedMessageMetrics(verb));
       lastDroppedInternal.put(verb, 0);
@@ -611,182 +635,42 @@ public final class MessagingService implements MessagingServiceMBean {
     sendOneWay(message, id, to);
   }
 
-  /**
-   * Send a message to a given endpoint. This method adheres to the fire and forget style messaging.
-   *
-   * @param message messages to be sent.
-   * @param to endpoint to which the message needs to be sent
-   */
-  /*
-  public void sendOneWay(MessageOut message, int id, InetAddress to)
-  {
-      if (logger.isTraceEnabled())
-          logger.trace(FBUtilities.getBroadcastAddress() + " sending " + message.verb + " to " + id + "@" + to);
-
-      if (to.equals(FBUtilities.getBroadcastAddress()))
-          logger.trace("Message-to-self {} going over MessagingService", message);
-
-      // message sinks are a testing hook
-      MessageOut processedMessage = SinkManager.processOutboundMessage(message, id, to);
-      if (processedMessage == null)
-      {
-          return;
-      }
-
-      // get pooled connection (really, connection queue)
-      OutboundTcpConnection connection = getConnection(to, processedMessage);
-
-      // write it
-      connection.enqueue(processedMessage, id);
-  }
-  */
-
   // DMCK
   public void sendOneWay(MessageOut message, int id, InetAddress to) {
+    //logger.info("SendOneWay: {}", message.verb);
     if (message.verb == Verb.PAXOS_PREPARE
         || message.verb == Verb.PAXOS_PROPOSE
         || message.verb == Verb.PAXOS_COMMIT
         || message.verb == Verb.PAXOS_PREPARE_RESPONSE
         || message.verb == Verb.PAXOS_PROPOSE_RESPONSE
         || message.verb == Verb.PAXOS_COMMIT_RESPONSE) {
-      logger.info(
-          "[DMCK] interceptMessage: "
-              + FBUtilities.getBroadcastAddress()
-              + " sending "
-              + message.verb
-              + " to "
-              + id
-              + "@"
-              + to);
-      Thread interceptorThread = new Thread(new InterceptorThread(message, id, to));
-      interceptorThread.start();
+
+      // BRC - Removed DMCK code
+
+      // BRC - Write the message content to server, do not send it to destination yet
+      synchronized (tc) {
+        tc.writeToSocket(message, id, to);
+      }
     } else {
       sendMessage(message, id, to);
     }
   }
 
-  private static String transformVerbToString(Verb msgVerb) {
-    String result = "";
-    switch (msgVerb) {
-      case PAXOS_PREPARE:
-        result = "PAXOS_PREPARE";
-        break;
-      case PAXOS_PROPOSE:
-        result = "PAXOS_PROPOSE";
-        break;
-      case PAXOS_COMMIT:
-        result = "PAXOS_COMMIT";
-        break;
-      case PAXOS_PREPARE_RESPONSE:
-        result = "PAXOS_PREPARE_RESPONSE";
-        break;
-      case PAXOS_PROPOSE_RESPONSE:
-        result = "PAXOS_PROPOSE_RESPONSE";
-        break;
-      case PAXOS_COMMIT_RESPONSE:
-        result = "PAXOS_COMMIT_RESPONSE";
-        break;
-      case READ:
-        result = "READ";
-        break;
-      case READ_REQUEST_RESPONSE:
-        result = "READ_REQUEST_RESPONSE";
-        break;
-      default:
-        break;
-    }
-    return result;
-  }
-
-  private static class InterceptorThread implements Runnable {
-
-    private MessageOut message;
-    private int id;
-    private InetAddress to;
-
-    public InterceptorThread(MessageOut message, int id, InetAddress to) {
-      this.message = message;
-      this.id = id;
-      this.to = to;
-    }
-
-    public void run() {
-      String sourceAddr = FBUtilities.getBroadcastAddress().getHostAddress();
-      String destinationAddr = to.getHostAddress();
-      int sourceId = Integer.parseInt(sourceAddr.substring(sourceAddr.length() - 1)) - 1;
-      int destinationId =
-          Integer.parseInt(destinationAddr.substring(destinationAddr.length() - 1)) - 1;
-
-      String verb = transformVerbToString(message.verb);
-
-      HashMap<String, Object> payload = new HashMap<String, Object>();
-      HashMap<String, Object> usrval = new HashMap<String, Object>();
-      if (message.payload instanceof PrepareResponse) {
-        PrepareResponse response = (PrepareResponse) message.payload;
-        payload.put("response", response.promised);
-        payload.put("inProgressCommitKey", response.inProgressCommit.key.hashCode());
-        payload.put(
-            "inProgressCommitBallot", response.inProgressCommit.ballot.toString().substring(0, 24));
-        //                payload.put("inProgressCommitUpdate",
-        // response.inProgressCommit.update.asMap().hashCode());
-        // usrval.put("inProgressCommitUpdate", response.inProgressCommit.update.asMap().hashCode());
-        payload.put("mostRecentCommitKey", response.mostRecentCommit.key.hashCode());
-        payload.put(
-            "mostRecentCommitBallot", response.mostRecentCommit.ballot.toString().substring(0, 24));
-        //                payload.put("mostRecentCommitUpdate",
-        // response.mostRecentCommit.update.asMap().hashCode());
-        // usrval.put("mostRecentCommitUpdate", response.mostRecentCommit.update.asMap().hashCode());
-      } else if (message.payload instanceof Commit) {
-        Commit commit = (Commit) message.payload;
-        payload.put("key", commit.key.hashCode());
-        payload.put("ballot", commit.ballot.toString().substring(0, 24));
-        // payload.put("update", commit.update.asMap().hashCode());
-        // usrval.put("update", commit.update.asMap().hashCode());
-      } else if (message.payload instanceof Boolean) {
-        Boolean response = (Boolean) message.payload;
-        payload.put("response", response);
-      }
-
-      /*
-      messageMap.put(eventId, message);
-      messageIdMap.put(eventId, id);
-      destinationMap.put(eventId, to);
-      */
-
-      InterceptionLayer.interceptPaxosEvent(
-          sourceId, destinationId, verb, payload.toString(), usrval.toString());
-      MessagingService.instance().sendMessage(message, id, to);
-
-      // DMCK: LOG on when the real message is executed.
-      logger.info("[DMCK] Message " + verb + " to node-" + destinationId + " is sent.");
-      InterceptionLayer.incrementSenderSequencer();
-    }
-  }
-
-  /*
-  public void enableMessage(long eventId)
-  {
-      MessageOut message = messageMap.remove(eventId);
-      int id = messageIdMap.remove(eventId);
-      InetAddress to = destinationMap.remove(eventId);
-
-      logger.info("[DMCK] enableMessage: " + FBUtilities.getBroadcastAddress() + " sending " + message.verb + " to " + id + "@" + to);
-
-      sendMessage(message, id, to);
-  }
-  */
-
   public void sendMessage(MessageOut message, int id, InetAddress to) {
+    logger.info("IN 1: " + message.verb);
+
     if (logger.isTraceEnabled())
-      logger.trace(
-          FBUtilities.getBroadcastAddress() + " sending " + message.verb + " to " + id + "@" + to);
+      logger.trace(FBUtilities.getBroadcastAddress() + " sending " + message.verb + " to " + id + "@" + to);
 
     if (to.equals(FBUtilities.getBroadcastAddress()))
       logger.trace("Message-to-self {} going over MessagingService", message);
 
+    logger.info("IN 2: " + message.verb);
+
     // message sinks are a testing hook
     MessageOut processedMessage = SinkManager.processOutboundMessage(message, id, to);
     if (processedMessage == null) {
+      logger.info("NULL");
       return;
     }
 
@@ -843,6 +727,8 @@ public final class MessagingService implements MessagingServiceMBean {
     } catch (IOException e) {
       throw new IOError(e);
     }
+
+    tc.writeToSocket("END");
   }
 
   public void receive(MessageIn message, int id, long timestamp) {
@@ -850,21 +736,7 @@ public final class MessagingService implements MessagingServiceMBean {
     TraceState state = Tracing.instance.initializeFromMessage(message);
     if (state != null) state.trace("Message received from {}", message.from);
 
-    // DMCK
-    String sendAddr = message.from.getHostAddress();
-    int sender = Integer.parseInt(sendAddr.substring(sendAddr.length() - 1)) - 1;
-    String destAddr = FBUtilities.getBroadcastAddress().getHostAddress();
-    int recv = Integer.parseInt(destAddr.substring(destAddr.length() - 1)) - 1;
-
-    if (message.verb == Verb.PAXOS_PREPARE
-        || message.verb == Verb.PAXOS_PROPOSE
-        || message.verb == Verb.PAXOS_COMMIT
-        || message.verb == Verb.PAXOS_PREPARE_RESPONSE
-        || message.verb == Verb.PAXOS_PROPOSE_RESPONSE
-        || message.verb == Verb.PAXOS_COMMIT_RESPONSE) {
-      logger.info("[DMCK] Message {} received from {}", message.verb, message.from);
-      InterceptionLayer.enableReceiving(sender, recv, transformVerbToString(message.verb));
-    }
+    // BRC - Removed DMCK code
 
     message = SinkManager.processInboundMessage(message, id);
     if (message == null) return;
@@ -874,33 +746,6 @@ public final class MessagingService implements MessagingServiceMBean {
     assert stage != null : "No stage for message type " + message.verb;
 
     stage.execute(runnable, state);
-
-    // DMCK
-    if (message.verb == Verb.PAXOS_PREPARE
-        || message.verb == Verb.PAXOS_PROPOSE
-        || message.verb == Verb.PAXOS_COMMIT
-        || message.verb == Verb.PAXOS_PREPARE_RESPONSE
-        || message.verb == Verb.PAXOS_PROPOSE_RESPONSE
-        || message.verb == Verb.PAXOS_COMMIT_RESPONSE) {
-      InterceptionLayer.incrementReceiverSequencer();
-    }
-
-    if (message.verb == Verb.PAXOS_PREPARE_RESPONSE
-        || message.verb == Verb.PAXOS_PROPOSE_RESPONSE) {
-      Boolean resp = true;
-      String verb = "";
-      if (message.payload instanceof PrepareResponse) {
-        PrepareResponse response = (PrepareResponse) message.payload;
-        resp = response.promised;
-        verb += "PAXOS_PREPARE_RESPONSE";
-      } else if (message.payload instanceof Boolean) {
-        Boolean response = (Boolean) message.payload;
-        resp = response;
-        verb += "PAXOS_PROPOSE_RESPONSE";
-      }
-      logger.info("[DMCK] Message {} received at {} response={}", verb, recv, resp);
-      InterceptionLayer.updateResponseState(recv, verb, resp);
-    }
   }
 
   public void setCallbackForTests(int messageId, CallbackInfo callback) {
@@ -959,6 +804,7 @@ public final class MessagingService implements MessagingServiceMBean {
   public boolean knowsVersion(InetAddress endpoint) {
     return versions.get(endpoint) != null;
   }
+
 
   public void incrementDroppedMessages(Verb verb) {
     assert DROPPABLE_VERBS.contains(verb) : "Verb " + verb + " should not legally be dropped";
@@ -1122,4 +968,5 @@ public final class MessagingService implements MessagingServiceMBean {
     }
     return result;
   }
+
 }

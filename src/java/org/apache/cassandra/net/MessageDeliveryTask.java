@@ -17,6 +17,8 @@
  */
 package org.apache.cassandra.net;
 
+import org.apache.cassandra.testing.TestingClient;
+import org.apache.cassandra.utils.FBUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,5 +56,16 @@ public class MessageDeliveryTask implements Runnable
         }
 
         verbHandler.doVerb(message, id);
+        if (message.verb == MessagingService.Verb.PAXOS_PREPARE
+            || message.verb == MessagingService.Verb.PAXOS_PROPOSE
+            || message.verb == MessagingService.Verb.PAXOS_COMMIT
+            || message.verb == MessagingService.Verb.PAXOS_PREPARE_RESPONSE
+            || message.verb == MessagingService.Verb.PAXOS_PROPOSE_RESPONSE
+            || message.verb == MessagingService.Verb.PAXOS_COMMIT_RESPONSE) {
+            // BRC - Send ACK to server that the message is processed
+            String destAddr = FBUtilities.getBroadcastAddress().getHostAddress();
+            int recv = Integer.parseInt(destAddr.substring(destAddr.length() - 1)) - 1;
+            TestingClient.getInstance().writeToSocket(message, recv, FBUtilities.getBroadcastAddress());
+        }
     }
 }

@@ -55,8 +55,6 @@ import org.apache.cassandra.service.paxos.PaxosState;
 import org.apache.cassandra.thrift.cassandraConstants;
 import org.apache.cassandra.utils.*;
 
-import edu.uchicago.cs.ucare.dmck.interceptor.InterceptionLayer;
-
 import static org.apache.cassandra.cql3.QueryProcessor.processInternal;
 
 public class SystemKeyspace
@@ -805,11 +803,6 @@ public class SystemKeyspace
                                       ByteBufferUtil.bytesToHex(promise.key),
                                       promise.update.id()));
 
-        // DMCK
-        String sourceAddr = FBUtilities.getBroadcastAddress().getHostAddress();
-        long sourceId = Long.parseLong(sourceAddr.substring(sourceAddr.length() - 1))-1;
-        InterceptionLayer.updateState(sourceId, "inProgress", promise.key.hashCode(), promise.ballot.toString().substring(0, 24));
-//        InterceptionLayer.updateState2(sourceId, "inProgress", promise.ballot.toString().substring(0, 24), promise.key.hashCode(), promise.update.asMap().hashCode());
     }
 
     public static void savePaxosProposal(Commit commit)
@@ -823,11 +816,6 @@ public class SystemKeyspace
                                       ByteBufferUtil.bytesToHex(commit.key),
                                       commit.update.id()));
 
-        // DMCK
-        String sourceAddr = FBUtilities.getBroadcastAddress().getHostAddress();
-        long sourceId = Long.parseLong(sourceAddr.substring(sourceAddr.length() - 1))-1;
-        InterceptionLayer.updateState(sourceId, "inProgress", commit.key.hashCode(), commit.ballot.toString().substring(0, 24));
-//        InterceptionLayer.updateState2(sourceId, "inProgress", commit.ballot.toString().substring(0, 24), commit.key.hashCode(), commit.update.asMap().hashCode());
     }
 
     private static int paxosTtl(CFMetaData metadata)
@@ -851,12 +839,5 @@ public class SystemKeyspace
                                       ByteBufferUtil.bytesToHex(commit.update.toBytes()),
                                       ByteBufferUtil.bytesToHex(commit.key),
                                       commit.update.id()));
-
-        // DMCK
-        String sourceAddr = FBUtilities.getBroadcastAddress().getHostAddress();
-        long sourceId = Long.parseLong(sourceAddr.substring(sourceAddr.length() - 1))-1;
-        InterceptionLayer.updateState2(sourceId, "inProgress", proposalAfterCommit ? inProgressBallot.toString().substring(0, 24) : commit.ballot.toString().substring(0, 24), 
-        		commit.key.hashCode(), commit.update.asMap().hashCode());
-        InterceptionLayer.updateState2(sourceId, "mostRecent", commit.ballot.toString().substring(0, 24), commit.key.hashCode(), commit.update.asMap().hashCode());
     }
 }

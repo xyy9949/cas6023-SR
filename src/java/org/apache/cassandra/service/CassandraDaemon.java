@@ -54,6 +54,7 @@ import org.apache.cassandra.utils.CLibrary;
 import org.apache.cassandra.utils.Mx4jTool;
 import org.apache.cassandra.utils.Pair;
 
+import org.apache.cassandra.testing.TestingClient;
 /**
  * The <code>CassandraDaemon</code> is an abstraction for a Cassandra daemon
  * service, which defines not only a way to activate and deactivate it, but also
@@ -377,6 +378,21 @@ public class CassandraDaemon
         setup();
     }
 
+    Thread testingThread;
+    TestingClient tc;
+
+    //BRC - Instrumentation to connect to the explorer server
+    public void connectToTestServer() {
+        tc = TestingClient.getInstance();
+
+        testingThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                tc.connect();
+            }
+        });
+        testingThread.start();
+    }
     /**
      * Start the Cassandra Daemon, assuming that it has already been
      * initialized via {@link #init(String[])}
@@ -410,6 +426,7 @@ public class CassandraDaemon
         logger.info("Cassandra shutting down...");
         thriftServer.stop();
         nativeServer.stop();
+        //testingThread.stop();
     }
 
 
@@ -465,6 +482,7 @@ public class CassandraDaemon
 
             System.exit(3);
         }
+
     }
 
     /**
