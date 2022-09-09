@@ -19,9 +19,9 @@
  -->
 <project default="jar" name="word_count" xmlns:ivy="antlib:org.apache.ivy.ant">
     <property name="cassandra.dir" value="../.." />
-    <property name="cassandra.dir.lib" value="${cassandra.dir}/lib" />
-    <property name="cassandra.classes" value="${cassandra.dir}/build/classes" />
-    <property name="build.src" value="${basedir}/src" />
+    <property name="cassandra.dir.lib" value="../../lib" />
+    <property name="cassandra.classes" value="../../build/classes" />
+    <property name="build.src" value="/cas-6023/examples/hadoop_word_count/src" />
     <property name="build.dir" value="${basedir}/build" />
     <property name="ivy.lib.dir" value="${build.dir}/lib" />
     <property name="build.classes" value="${build.dir}/classes" />
@@ -46,14 +46,14 @@
             <include name="**/*.jar" />
         </fileset>
         <!-- cassandra dependencies -->
-        <fileset dir="${cassandra.dir.lib}">
+        <fileset dir="../../lib">
             <include name="**/*.jar" />
         </fileset>
-        <fileset dir="${cassandra.dir}/build/lib/jars">
+        <fileset dir="../../build/lib/jars">
             <include name="**/*.jar" />
         </fileset>
-        <pathelement location="${cassandra.classes}/main" />
-        <pathelement location="${cassandra.classes}/thrift" />
+        <pathelement location="../../build/classes/main" />
+        <pathelement location="../../build/classes/thrift" />
     </path>
 
     <target name="init">
@@ -71,12 +71,12 @@
         <mkdir dir="${build.classes}/META-INF" />
         <jar jarfile="${build.dir}/${final.name}.jar">
            <fileset dir="${build.classes}" />
-           <fileset dir="${cassandra.classes}/main" />
-           <fileset dir="${cassandra.classes}/thrift" />
-           <fileset dir="${cassandra.dir}">
+           <fileset dir="../../build/classes/main" />
+           <fileset dir="../../build/classes/thrift" />
+           <fileset dir="../..">
                <include name="lib/**/*.jar" />
            </fileset>
-           <zipfileset dir="${cassandra.dir}/build/lib/jars/" prefix="lib">
+           <zipfileset dir="../../build/lib/jars/" prefix="lib">
                <include name="**/*.jar" />
            </zipfileset>
            <fileset file="${basedir}/cassandra.yaml" />

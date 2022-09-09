@@ -17,7 +17,7 @@
  ~ specific language governing permissions and limitations
  ~ under the License.
  -->
-<project basedir="." default="jar" name="apache-cassandra"
+<project basedir="" default="jar" name="apache-cassandra"
          xmlns:artifact="antlib:org.apache.maven.artifact.ant">
     <property environment="env"/>
     <property file="build.properties" />
@@ -32,31 +32,31 @@
 
     <!-- directory details -->
     <property name="basedir" value="."/>
-    <property name="build.src" value="${basedir}/src"/>
-    <property name="build.src.java" value="${basedir}/src/java"/>
-    <property name="build.src.resources" value="${basedir}/src/resources"/>
-    <property name="build.src.gen-java" value="${basedir}/src/gen-java"/>
-    <property name="build.lib" value="${basedir}/lib"/>
-    <property name="build.dir" value="${basedir}/build"/>
-    <property name="build.dir.lib" value="${basedir}/build/lib"/>
-    <property name="build.test.dir" value="${build.dir}/test"/>
-    <property name="build.classes" value="${build.dir}/classes"/>
-    <property name="build.classes.main" value="${build.classes}/main" />
-    <property name="build.classes.thrift" value="${build.classes}/thrift" />
+    <property name="build.src" value="/cas-6023/src"/>
+    <property name="build.src.java" value="/cas-6023/src/java"/>
+    <property name="build.src.resources" value="/cas-6023/src/resources"/>
+    <property name="build.src.gen-java" value="/cas-6023/src/gen-java"/>
+    <property name="build.lib" value="/cas-6023/lib"/>
+    <property name="build.dir" value="/cas-6023/build"/>
+    <property name="build.dir.lib" value="/cas-6023/build/lib"/>
+    <property name="build.test.dir" value="/cas-6023/build/test"/>
+    <property name="build.classes" value="/cas-6023/build/classes"/>
+    <property name="build.classes.main" value="/cas-6023/build/classes/main" />
+    <property name="build.classes.thrift" value="/cas-6023/build/classes/thrift" />
     <property name="javadoc.dir" value="${build.dir}/javadoc"/>
     <property name="javadoc.jars.dir" value="${build.dir}/javadocs"/>
-    <property name="interface.dir" value="${basedir}/interface"/>
-    <property name="interface.thrift.dir" value="${interface.dir}/thrift"/>
-    <property name="interface.thrift.gen-java" value="${interface.thrift.dir}/gen-java"/>
-    <property name="test.dir" value="${basedir}/test"/>
-    <property name="test.resources" value="${test.dir}/resources"/>
-    <property name="test.lib" value="${build.dir}/test/lib"/>
-    <property name="test.classes" value="${build.dir}/test/classes"/>
-    <property name="test.conf" value="${test.dir}/conf"/>
-    <property name="test.data" value="${test.dir}/data"/>
+    <property name="interface.dir" value="/cas-6023/interface"/>
+    <property name="interface.thrift.dir" value="/cas-6023/interface/thrift"/>
+    <property name="interface.thrift.gen-java" value="/cas-6023/interface/thrift/gen-java"/>
+    <property name="test.dir" value="/cas-6023/test"/>
+    <property name="test.resources" value="/cas-6023/test/resources"/>
+    <property name="test.lib" value="/cas-6023/build/test/lib"/>
+    <property name="test.classes" value="/cas-6023/build/test/classes"/>
+    <property name="test.conf" value="/cas-6023/test/conf"/>
+    <property name="test.data" value="/cas-6023/test/data"/>
     <property name="test.name" value="*Test"/>
-    <property name="test.unit.src" value="${test.dir}/unit"/>
-    <property name="test.long.src" value="${test.dir}/long"/>
+    <property name="test.unit.src" value="/cas-6023/test/unit"/>
+    <property name="test.long.src" value="/cas-6023/test/long"/>
     <property name="dist.dir" value="${build.dir}/dist"/>
 	
 	<property name="source.version" value="1.7"/>
@@ -67,14 +67,14 @@
     </condition>
     <property name="version" value="${base.version}-SNAPSHOT"/>
     <property name="version.properties.dir"
-              value="${build.classes.main}/org/apache/cassandra/config/" />
+              value="/cas-6023/build/classes/main/org/apache/cassandra/config/" />
     <property name="final.name" value="${ant.project.name}-${version}"/>
  
     <!-- details of what version of Maven ANT Tasks to fetch -->
     <property name="maven-ant-tasks.version" value="2.1.3" />
     <property name="maven-ant-tasks.local" value="${user.home}/.m2/repository/org/apache/maven/maven-ant-tasks"/>
     <property name="maven-ant-tasks.url"
-              value="http://repo2.maven.org/maven2/org/apache/maven/maven-ant-tasks" />
+              value="https://repo1.maven.org/maven2/org/apache/maven/maven-ant-tasks" />
     <!-- details of how and which Maven repository we publish to -->
     <property name="maven.version" value="3.0.3" />
     <condition property="maven-repository-url" value="https://repository.apache.org/service/local/staging/deploy/maven2">
@@ -97,7 +97,7 @@
     <property name="cobertura.datafile" value="${cobertura.build.dir}/cobertura.ser"/>
 
     <condition property="maven-ant-tasks.jar.exists">
-      <available file="${build.dir}/maven-ant-tasks-${maven-ant-tasks.version}.jar" />
+      <available file="/cas-6023/build/maven-ant-tasks-2.1.3.jar" />
     </condition>
 
     <condition property="maven-ant-tasks.jar.local">
@@ -105,7 +105,7 @@
     </condition>
 
     <condition property="is.source.artifact">
-      <available file="${build.src.java}" type="dir" />
+      <available file="/cas-6023/src/java" type="dir" />
     </condition>
 
     <tstamp>
@@ -115,16 +115,16 @@
     <!--
          Add all the dependencies.
     -->
-    <path id="maven-ant-tasks.classpath" path="${build.dir}/maven-ant-tasks-${maven-ant-tasks.version}.jar" />
+    <path id="maven-ant-tasks.classpath" path="/cas-6023/build/maven-ant-tasks-2.1.3.jar" />
     <path id="cassandra.classpath">
         <pathelement location="${cobertura.classes.dir}"/>
-        <pathelement location="${build.classes.main}" />
-        <pathelement location="${build.classes.thrift}" />
-        <fileset dir="${build.lib}">
+        <pathelement location="/cas-6023/build/classes/main" />
+        <pathelement location="/cas-6023/build/classes/thrift" />
+        <fileset dir="/cas-6023/lib">
           <include name="**/*.jar" />
           <exclude name="**/*-sources.jar"/>
         </fileset>
-        <fileset dir="${build.dir.lib}">
+        <fileset dir="/cas-6023/build/lib">
           <include name="**/*.jar" />
           <exclude name="**/*-sources.jar"/>
         </fileset>
@@ -154,24 +154,24 @@
     <target name="init">
         <fail unless="is.source.artifact"
             message="Not a source artifact, stopping here." />
-        <mkdir dir="${build.classes.main}"/>
-        <mkdir dir="${build.classes.thrift}"/>
-        <mkdir dir="${test.lib}"/>
-        <mkdir dir="${test.classes}"/>
-        <mkdir dir="${build.src.gen-java}"/>
-        <mkdir dir="${build.dir.lib}"/>
+        <mkdir dir="/cas-6023/build/classes/main"/>
+        <mkdir dir="/cas-6023/build/classes/thrift"/>
+        <mkdir dir="/cas-6023/build/test/lib"/>
+        <mkdir dir="/cas-6023/build/test/classes"/>
+        <mkdir dir="/cas-6023/src/gen-java"/>
+        <mkdir dir="/cas-6023/build/lib"/>
     </target>
 
     <target name="clean" description="Remove all locally created artifacts">
-        <delete dir="${build.test.dir}" />
-        <delete dir="${build.classes}" />
+        <delete dir="/cas-6023/build/test" />
+        <delete dir="/cas-6023/build/classes" />
         <delete dir="${cobertura.classes.dir}" />
-        <delete dir="${build.src.gen-java}" />
+        <delete dir="/cas-6023/src/gen-java" />
     </target>
     <target depends="clean" name="cleanall"/>
 
     <target name="realclean" depends="clean" description="Remove the entire build directory and all downloaded artifacts">
-        <delete dir="${build.dir}" />
+        <delete dir="/cas-6023/build" />
     </target>
 
     <!--
@@ -179,8 +179,8 @@
     -->
     <target name="check-gen-cli-grammar">
         <uptodate property="cliUpToDate"
-                srcfile="${build.src.java}/org/apache/cassandra/cli/Cli.g"
-                targetfile="${build.src.gen-java}/org/apache/cassandra/cli/Cli.tokens"/>
+                srcfile="/cas-6023/src/java/org/apache/cassandra/cli/Cli.g"
+                targetfile="/cas-6023/src/gen-java/org/apache/cassandra/cli/Cli.tokens"/>
     </target>
 
     <target name="gen-cli-grammar" depends="check-gen-cli-grammar" unless="cliUpToDate">
@@ -200,13 +200,13 @@
     -->
     <target name="check-gen-cql2-grammar">
         <uptodate property="cql2current"
-                srcfile="${build.src.java}/org/apache/cassandra/cql/Cql.g"
-                targetfile="${build.src.gen-java}/org/apache/cassandra/cql/Cql.tokens"/>
+                srcfile="/cas-6023/src/java/org/apache/cassandra/cql/Cql.g"
+                targetfile="/cas-6023/src/gen-java/org/apache/cassandra/cql/Cql.tokens"/>
     </target>
     <target name="check-gen-cql3-grammar">
         <uptodate property="cql3current"
-                srcfile="${build.src.java}/org/apache/cassandra/cql3/Cql.g"
-                targetfile="${build.src.gen-java}/org/apache/cassandra/cql3/Cql.tokens"/>
+                srcfile="/cas-6023/src/java/org/apache/cassandra/cql3/Cql.g"
+                targetfile="/cas-6023/src/gen-java/org/apache/cassandra/cql3/Cql.tokens"/>
     </target>
  
     <target name="gen-cql2-grammar" depends="check-gen-cql2-grammar" unless="cql2current">
@@ -256,7 +256,7 @@
     <target name="maven-ant-tasks-localrepo" unless="maven-ant-tasks.jar.exists" if="maven-ant-tasks.jar.local"
             depends="init" description="Fetch Maven ANT Tasks from Maven Local Repository">
       <copy file="${maven-ant-tasks.local}/${maven-ant-tasks.version}/maven-ant-tasks-${maven-ant-tasks.version}.jar"
-           tofile="${build.dir}/maven-ant-tasks-${maven-ant-tasks.version}.jar"/>
+           tofile="/cas-6023/build/maven-ant-tasks-2.1.3.jar"/>
       <property name="maven-ant-tasks.jar.exists" value="true"/>
     </target>
 
@@ -264,7 +264,7 @@
             description="Fetch Maven ANT Tasks from Maven Central Repositroy">
       <echo>Downloading Maven ANT Tasks...</echo>
       <get src="${maven-ant-tasks.url}/${maven-ant-tasks.version}/maven-ant-tasks-${maven-ant-tasks.version}.jar"
-           dest="${build.dir}/maven-ant-tasks-${maven-ant-tasks.version}.jar" usetimestamp="true" />
+           dest="/cas-6023/build/maven-ant-tasks-2.1.3.jar" usetimestamp="true" />
     </target>
 
     <target name="maven-ant-tasks-init" depends="init,maven-ant-tasks-download" unless="maven-ant-tasks.initialized"
@@ -327,11 +327,11 @@
                     artifactId="cassandra-parent"
                     packaging="pom"
                     version="${version}"
-                    url="http://cassandra.apache.org"
+                    url="https://cassandra.apache.org"
                     name="Apache Cassandra"
                     inceptionYear="2009"
                     description="The Apache Cassandra Project develops a highly scalable second-generation distributed database, bringing together Dynamo's fully distributed design and Bigtable's ColumnFamily-based data model.">
-        <license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+        <license name="The Apache Software License, Version 2.0" url="https://www.apache.org/licenses/LICENSE-2.0.txt"/>
         <scm connection="${scm.connection}" developerConnection="${scm.developerConnection}" url="${scm.url}"/>
         <dependencyManagement>
           <dependency groupId="org.xerial.snappy" artifactId="snappy-java" version="1.0.5"/>
@@ -427,7 +427,7 @@
 
       <artifact:pom id="all-pom"
                     artifactId="cassandra-all"
-                    url="http://cassandra.apache.org"
+                    url="https://cassandra.apache.org"
                     name="Apache Cassandra">
         <parent groupId="org.apache.cassandra"
                 artifactId="cassandra-parent"
@@ -474,7 +474,7 @@
       </artifact:pom>
       <artifact:pom id="thrift-pom"
                     artifactId="cassandra-thrift"
-                    url="http://cassandra.apache.org"
+                    url="https://cassandra.apache.org"
                     name="Apache Cassandra">
         <parent groupId="org.apache.cassandra"
                 artifactId="cassandra-parent"
@@ -486,7 +486,7 @@
       </artifact:pom>
       <artifact:pom id="clientutil-pom"
                     artifactId="cassandra-clientutil"
-                    url="http://cassandra.apache.org"
+                    url="https://cassandra.apache.org"
                     name="Apache Cassandra">
         <parent groupId="org.apache.cassandra"
                 artifactId="cassandra-parent"
@@ -498,7 +498,7 @@
       <artifact:pom id="dist-pom"
                     artifactId="apache-cassandra"
                     packaging="pom"
-                    url="http://cassandra.apache.org"
+                    url="https://cassandra.apache.org"
                     name="Apache Cassandra">
         <parent groupId="org.apache.cassandra"
                 artifactId="cassandra-parent"
@@ -522,11 +522,11 @@
           <remoteRepository refid="central"/>
       </artifact:dependencies>
 
-      <copy todir="${build.dir.lib}/jars">
+      <copy todir="/cas-6023/build/lib/jars">
           <fileset refid="build-dependency-jars"/>
           <mapper type="flatten"/>
       </copy>
-      <copy todir="${build.dir.lib}/sources">
+      <copy todir="/cas-6023/build/lib/sources">
           <fileset refid="build-dependency-sources"/>
           <mapper type="flatten"/>
       </copy>
@@ -559,13 +559,13 @@
        tests run.
     -->
     <target name="check-gen-thrift-java">
-      <uptodate property="thriftUpToDate" srcfile="${interface.dir}/cassandra.thrift"
-            targetfile="${interface.thrift.gen-java}/org/apache/cassandra/thrift/Cassandra.java" />
+      <uptodate property="thriftUpToDate" srcfile="/cas-6023/interface/cassandra.thrift"
+            targetfile="/cas-6023/interface/thrift/gen-java/org/apache/cassandra/thrift/Cassandra.java" />
     </target>
     <target name="gen-thrift-java" unless="thriftUpToDate" depends="check-gen-thrift-java"
             description="Generate Thrift Java artifacts">
       <echo>Generating Thrift Java code from ${basedir}/interface/cassandra.thrift...</echo>
-      <exec executable="thrift" dir="${basedir}/interface" failonerror="true">
+      <exec executable="thrift" dir="/cas-6023/interface" failonerror="true">
         <arg line="--gen java:hashcode" />
         <arg line="-o ${interface.thrift.dir}" />
         <arg line="cassandra.thrift" />
@@ -589,12 +589,12 @@
 
     <target name="gen-thrift-py" description="Generate Thrift Python artifacts">
       <echo>Generating Thrift Python code from ${basedir}/interface/cassandra.thrift...</echo>
-      <exec executable="thrift" dir="${basedir}/interface" failonerror="true">
+      <exec executable="thrift" dir="/cas-6023/interface" failonerror="true">
         <arg line="--gen py" />
         <arg line="-o ${interface.thrift.dir}" />
         <arg line="cassandra.thrift" />
       </exec>
-      <exec executable="thrift" dir="${basedir}/interface" failonerror="true">
+      <exec executable="thrift" dir="/cas-6023/interface" failonerror="true">
         <arg line="--gen py:twisted" />
         <arg line="-o ${interface.thrift.dir}" />
         <arg line="cassandra.thrift" />
@@ -604,7 +604,7 @@
     <!-- create properties file with C version -->
     <target name="createVersionPropFile">
       <taskdef name="propertyfile" classname="org.apache.tools.ant.taskdefs.optional.PropertyFile"/>
-      <propertyfile file="${version.properties.dir}/version.properties">
+      <propertyfile file="/cas-6023/build/classes/main/org/apache/cassandra/config/version.properties">
         <entry key="CassandraVersion" value="${version}"/>
       </propertyfile>
     </target>
@@ -614,7 +614,7 @@
       <java classname="org.apache.cassandra.service.CassandraDaemon" fork="true">
         <classpath>
           <path refid="cassandra.classpath"/>  
-          <pathelement location="${test.conf}"/>
+          <pathelement location="/cas-6023/test/conf"/>
         </classpath>
         <jvmarg value="-Dstorage-config=${test.conf}"/>
         <jvmarg value="-javaagent:${basedir}/lib/jamm-0.2.5.jar" />
@@ -634,38 +634,38 @@
         <echo message="${ant.project.name}: ${ant.file}"/>
         <!-- Order matters! -->
         <javac debug="true" debuglevel="${debuglevel}"
-               destdir="${build.classes.thrift}" includeantruntime="false" source="${source.version}" target="${target.version}">
+               destdir="/cas-6023/build/classes/thrift" includeantruntime="false" source="${source.version}" target="${target.version}">
             <src path="${interface.thrift.dir}/gen-java"/>
             <classpath refid="cassandra.classpath"/>
         </javac>
         <javac debug="true" debuglevel="${debuglevel}"
-               destdir="${build.classes.main}" includeantruntime="false" source="${source.version}" target="${target.version}">
+               destdir="/cas-6023/build/classes/main" includeantruntime="false" source="${source.version}" target="${target.version}">
             <src path="${build.src.java}"/>
             <src path="${build.src.gen-java}"/>
             <classpath refid="cassandra.classpath"/>
         </javac>
-        <copy todir="${build.classes.main}">
-            <fileset dir="${build.src.resources}" />
+        <copy todir="/cas-6023/build/classes/main">
+            <fileset dir="/cas-6023/src/resources" />
         </copy>
         <antcall target="createVersionPropFile"/>
     </target>
 
     <!-- Stress build file -->
-    <property name="stress.build.src" value="${basedir}/tools/stress/src" />
-    <property name="stress.build.classes" value="${build.classes}/stress" />
-	<property name="stress.manifest" value="${stress.build.classes}/MANIFEST.MF" />
+    <property name="stress.build.src" value="/cas-6023/tools/stress/src" />
+    <property name="stress.build.classes" value="/cas-6023/build/classes/stress" />
+	<property name="stress.manifest" value="/cas-6023/build/classes/stress/MANIFEST.MF" />
     <path id="cassandra.classes">
-        <pathelement location="${basedir}/build/classes/main" />
-        <pathelement location="${basedir}/build/classes/thrift" />
+        <pathelement location="/cas-6023/build/classes/main" />
+        <pathelement location="/cas-6023/build/classes/thrift" />
     </path>
     <target name="stress-build" depends="build" description="build stress tool">
-    	<mkdir dir="${stress.build.classes}" />
-        <javac debug="true" debuglevel="${debuglevel}" destdir="${stress.build.classes}" includeantruntime="true" source="${source.version}" target="${target.version}">
+    	<mkdir dir="/cas-6023/build/classes/stress" />
+        <javac debug="true" debuglevel="${debuglevel}" destdir="/cas-6023/build/classes/stress" includeantruntime="true" source="${source.version}" target="${target.version}">
             <src path="${stress.build.src}" />
             <classpath>
                 <path refid="cassandra.classes" />
                 <path>
-                    <fileset dir="${build.lib}">
+                    <fileset dir="/cas-6023/lib">
                         <include name="**/*.jar" />
                     </fileset>
                 </path>
@@ -692,21 +692,21 @@
     <target name="jar"
             depends="build, build-test, stress-build, write-poms"
             description="Assemble Cassandra JAR files">
-      <mkdir dir="${build.classes.main}/META-INF" />
-      <mkdir dir="${build.classes.thrift}/META-INF" />
+      <mkdir dir="/cas-6023/build/classes/main/META-INF" />
+      <mkdir dir="/cas-6023/build/classes/thrift/META-INF" />
       <copy file="LICENSE.txt"
-            tofile="${build.classes.main}/META-INF/LICENSE.txt"/>
+            tofile="/cas-6023/build/classes/main/META-INF/LICENSE.txt"/>
       <copy file="LICENSE.txt"
-            tofile="${build.classes.thrift}/META-INF/LICENSE.txt"/>
+            tofile="/cas-6023/build/classes/thrift/META-INF/LICENSE.txt"/>
       <copy file="NOTICE.txt"
-            tofile="${build.classes.main}/META-INF/NOTICE.txt"/>
+            tofile="/cas-6023/build/classes/main/META-INF/NOTICE.txt"/>
       <copy file="NOTICE.txt"
-            tofile="${build.classes.thrift}/META-INF/NOTICE.txt"/>
+            tofile="/cas-6023/build/classes/thrift/META-INF/NOTICE.txt"/>
 
       <!-- Thrift Jar -->
       <jar jarfile="${build.dir}/${ant.project.name}-thrift-${version}.jar"
-           basedir="${build.classes.thrift}">
-        <fileset dir="${build.classes.main}">
+           basedir="/cas-6023/build/classes/thrift">
+        <fileset dir="/cas-6023/build/classes/main">
           <include name="org/apache/cassandra/thrift/ITransportFactory.class" />
           <include name="org/apache/cassandra/thrift/TFramedTransportFactory.class" />
         </fileset>
@@ -719,7 +719,7 @@
 
       <!-- Main Jar -->
       <jar jarfile="${build.dir}/${final.name}.jar"
-           basedir="${build.classes.main}">
+           basedir="/cas-6023/build/classes/main">
         <manifest>
         <!-- <section name="org/apache/cassandra/infrastructure"> -->
           <attribute name="Implementation-Title" value="Cassandra"/>
@@ -736,7 +736,7 @@
       <!-- Clientutil Jar -->
       <!-- TODO: write maven pom here -->
       <jar jarfile="${build.dir}/${ant.project.name}-clientutil-${version}.jar">
-        <fileset dir="${build.classes.main}">
+        <fileset dir="/cas-6023/build/classes/main">
           <include name="org/apache/cassandra/serializers/*" />
           <include name="org/apache/cassandra/utils/ByteBufferUtil*.class" />
           <include name="org/apache/cassandra/utils/Hex.class" />
@@ -753,14 +753,14 @@
       </jar>
 
       <!-- Stress jar -->
-      <manifest file="${stress.manifest}">
+      <manifest file="/cas-6023/build/classes/stress/MANIFEST.MF">
         <attribute name="Built-By" value="Pavel Yaskevich"/>
         <attribute name="Main-Class" value="org.apache.cassandra.stress.Stress"/>
       </manifest>
-      <mkdir dir="${stress.build.classes}/META-INF" />
-      <mkdir dir="${build.dir}/tools/lib/" />
-      <jar destfile="${build.dir}/tools/lib/stress.jar" manifest="${stress.manifest}">
-        <fileset dir="${stress.build.classes}"/>
+      <mkdir dir="/cas-6023/build/classes/stress/META-INF" />
+      <mkdir dir="/cas-6023/build/tools/lib/" />
+      <jar destfile="/cas-6023/build/tools/lib/stress.jar" manifest="/cas-6023/build/classes/stress/MANIFEST.MF">
+        <fileset dir="/cas-6023/build/classes/stress"/>
       </jar>
     </target>
 
@@ -771,7 +771,7 @@
       <mkdir dir="${javadoc.jars.dir}"/>
       <create-javadoc destdir="${javadoc.jars.dir}/thrift">
         <filesets>
-          <fileset dir="${interface.thrift.dir}/gen-java" defaultexcludes="yes">
+          <fileset dir="/cas-6023/interface/thrift/gen-java" defaultexcludes="yes">
             <include name="org/apache/**/*.java"/>
           </fileset>
         </filesets>
@@ -781,10 +781,10 @@
 
       <create-javadoc destdir="${javadoc.jars.dir}/main">
         <filesets>
-          <fileset dir="${build.src.java}" defaultexcludes="yes">
+          <fileset dir="/cas-6023/src/java" defaultexcludes="yes">
             <include name="org/apache/**/*.java"/>
           </fileset>
-          <fileset dir="${build.src.gen-java}" defaultexcludes="yes">
+          <fileset dir="/cas-6023/src/gen-java" defaultexcludes="yes">
             <include name="org/apache/**/*.java"/>
           </fileset>
         </filesets>
@@ -794,7 +794,7 @@
 
       <create-javadoc destdir="${javadoc.jars.dir}/clientutil">
         <filesets>
-          <fileset dir="${build.src.java}" defaultexcludes="yes">
+          <fileset dir="/cas-6023/src/java" defaultexcludes="yes">
             <include name="org/apache/cassandra/serializers/*" />
             <include name="org/apache/cassandra/utils/ByteBufferUtil*.java" />
             <include name="org/apache/cassandra/utils/Hex.java" />
@@ -814,20 +814,20 @@
     -->
     <target name="sources-jar" depends="init" description="Assemble Cassandra Sources JAR file">
       <jar jarfile="${build.dir}/${ant.project.name}-thrift-${version}-sources.jar">
-        <fileset dir="${interface.thrift.dir}/gen-java" defaultexcludes="yes">
+        <fileset dir="/cas-6023/interface/thrift/gen-java" defaultexcludes="yes">
           <include name="org/apache/**/*.java"/>
         </fileset>
       </jar>
       <jar jarfile="${build.dir}/${final.name}-sources.jar">
-        <fileset dir="${build.src.java}" defaultexcludes="yes">
+        <fileset dir="/cas-6023/src/java" defaultexcludes="yes">
           <include name="org/apache/**/*.java"/>
         </fileset>
-        <fileset dir="${build.src.gen-java}" defaultexcludes="yes">
+        <fileset dir="/cas-6023/src/gen-java" defaultexcludes="yes">
           <include name="org/apache/**/*.java"/>
         </fileset>
       </jar>
       <jar jarfile="${build.dir}/${ant.project.name}-clientutil-${version}-sources.jar">
-        <fileset dir="${build.src.java}" defaultexcludes="yes">
+        <fileset dir="/cas-6023/src/java" defaultexcludes="yes">
           <include name="org/apache/cassandra/serializers/*" />
           <include name="org/apache/cassandra/utils/ByteBufferUtil*.java" />
           <include name="org/apache/cassandra/utils/Hex.java" />
@@ -841,8 +841,8 @@
             description="Create Cassandra release artifacts">
       <mkdir dir="${dist.dir}"/>
       <copy todir="${dist.dir}/lib">
-        <fileset dir="${build.lib}"/>
-        <fileset dir="${build.dir}">
+        <fileset dir="/cas-6023/lib"/>
+        <fileset dir="/cas-6023/build">
           <include name="${final.name}.jar" />
           <include name="${ant.project.name}-thrift-${version}.jar" />
           <include name="${ant.project.name}-clientutil-${version}.jar" />
@@ -869,7 +869,7 @@
         </fileset>
       </copy>
       <copy todir="${dist.dir}/">
-        <fileset dir="${basedir}">
+        <fileset dir="/cas-6023">
           <include name="*.txt" />
         </fileset>
       </copy>
@@ -877,7 +877,7 @@
         <fileset dir="${basedir}/tools/bin"/>
       </copy>
       <copy todir="${dist.dir}/tools/lib">
-        <fileset dir="${build.dir}/tools/lib/">
+        <fileset dir="/cas-6023/build/tools/lib/">
             <include name="*.jar" />
         </fileset>
       </copy>
@@ -908,7 +908,7 @@
       <tar compression="gzip" longfile="gnu"
            destfile="${build.dir}/${final.name}-src.tar.gz">
 
-        <tarfileset dir="${basedir}"
+        <tarfileset dir="/cas-6023"
                     prefix="${final.name}-src">
           <include name="**"/>
           <exclude name="build/**" />
@@ -923,12 +923,12 @@
         </tarfileset>
 
         <!-- Shell includes and batch files in bin/ -->
-        <tarfileset dir="${basedir}" prefix="${final.name}-src">
+        <tarfileset dir="/cas-6023" prefix="${final.name}-src">
           <include name="bin/*.in.sh" />
           <include name="bin/*.bat" />
         </tarfileset>
         <!-- Everything else (assumed to be scripts), is executable -->
-        <tarfileset dir="${basedir}" prefix="${final.name}-src" mode="755">
+        <tarfileset dir="/cas-6023" prefix="${final.name}-src" mode="755">
           <include name="bin/*"/>
           <exclude name="bin/*.in.sh" />
           <exclude name="bin/*.bat" />
@@ -938,15 +938,15 @@
 
     <target name="release" depends="artifacts,rat-init"
             description="Create and QC release artifacts">
-      <checksum forceOverwrite="yes" todir="${build.dir}" fileext=".md5"
+      <checksum forceOverwrite="yes" todir="/cas-6023/build" fileext=".md5"
                 algorithm="MD5">
-        <fileset dir="${build.dir}">
+        <fileset dir="/cas-6023/build">
           <include name="*.tar.gz" />
         </fileset>
       </checksum>
-      <checksum forceOverwrite="yes" todir="${build.dir}" fileext=".sha"
+      <checksum forceOverwrite="yes" todir="/cas-6023/build" fileext=".sha"
                 algorithm="SHA">
-        <fileset dir="${build.dir}">
+        <fileset dir="/cas-6023/build">
           <include name="*.tar.gz" />
         </fileset>
       </checksum>
@@ -974,7 +974,7 @@
     <javac
      debug="true"
      debuglevel="${debuglevel}"
-     destdir="${test.classes}"
+     destdir="/cas-6023/build/test/classes"
      includeantruntime="false"
      source="${source.version}" 
      target="${target.version}">
@@ -986,8 +986,8 @@
     </javac>
 
     <!-- Non-java resources needed by the test suite -->
-    <copy todir="${test.classes}">
-      <fileset dir="${test.resources}"/>
+    <copy todir="/cas-6023/build/test/classes">
+      <fileset dir="/cas-6023/test/resources"/>
     </copy>
   </target>
 
@@ -1014,10 +1014,10 @@
         <optjvmargs/>
         <classpath>
           <path refid="cassandra.classpath" />
-          <pathelement location="${test.classes}"/>
+          <pathelement location="/cas-6023/build/test/classes"/>
           <path refid="cobertura.classpath"/>
-          <pathelement location="${test.conf}"/>
-          <fileset dir="${test.lib}">
+          <pathelement location="/cas-6023/test/conf"/>
+          <fileset dir="/cas-6023/build/test/lib">
             <include name="**/*.jar" />
           </fileset>
         </classpath>
@@ -1049,16 +1049,16 @@
       <test name="org.apache.cassandra.serializers.ClientUtilsTest" />
       <formatter type="brief" usefile="false" />
       <classpath>
-        <pathelement location="${test.classes}" />
+        <pathelement location="/cas-6023/build/test/classes" />
         <pathelement location="${build.dir}/${ant.project.name}-clientutil-${version}.jar" />
         <pathelement location="${build.dir}/${ant.project.name}-thrift-${version}.jar" />
-        <pathelement location="${build.lib}/libthrift-0.9.0.jar" />
-        <pathelement location="${build.lib}/slf4j-api-1.7.2.jar" />
-        <pathelement location="${build.lib}/slf4j-log4j12-1.7.2.jar" />
-        <pathelement location="${build.lib}/log4j-1.2.16.jar" />
-        <pathelement location="${build.lib}/jackson-core-asl-1.9.2.jar" />
-        <pathelement location="${build.lib}/jackson-mapper-asl-1.9.2.jar" />
-        <fileset dir="${build.dir.lib}">
+        <pathelement location="/cas-6023/lib/libthrift-0.9.0.jar" />
+        <pathelement location="/cas-6023/lib/slf4j-api-1.7.2.jar" />
+        <pathelement location="/cas-6023/lib/slf4j-log4j12-1.7.2.jar" />
+        <pathelement location="/cas-6023/lib/log4j-1.2.16.jar" />
+        <pathelement location="/cas-6023/lib/jackson-core-asl-1.9.2.jar" />
+        <pathelement location="/cas-6023/lib/jackson-mapper-asl-1.9.2.jar" />
+        <fileset dir="/cas-6023/build/lib">
           <include name="**/junit*.jar" />
         </fileset>
       </classpath>
@@ -1192,10 +1192,10 @@
   <target name="javadoc" depends="init" description="Create javadoc">
     <create-javadoc destdir="${javadoc.dir}">
       <filesets>
-      <fileset dir="${build.src.java}" defaultexcludes="yes">
+      <fileset dir="/cas-6023/src/java" defaultexcludes="yes">
         <include name="org/apache/**/*.java"/>
       </fileset>
-      <fileset dir="${interface.thrift.gen-java}" defaultexcludes="yes">
+      <fileset dir="/cas-6023/interface/thrift/gen-java" defaultexcludes="yes">
         <include name="org/apache/**/*.java"/>
       </fileset>
       </filesets>
@@ -1265,7 +1265,7 @@
   </target>
 
   <pathconvert property="eclipse.project.name">
-    <path path="${basedir}" />
+    <path path="/cas-6023" />
     <regexpmapper from="^.*/([^/]+)$$" to="\1" handledirsep="yes" />
   </pathconvert>
 

@@ -19,22 +19,22 @@
  -->
 <project default="jar" name="client_only">
     <property name="cassandra.dir" value="../.." />
-    <property name="cassandra.dir.lib" value="${cassandra.dir}/lib" />
-    <property name="cassandra.classes" value="${cassandra.dir}/build/classes/main" />
-    <property name="build.src" value="${basedir}/src" />
+    <property name="cassandra.dir.lib" value="../../lib" />
+    <property name="cassandra.classes" value="../../build/classes/main" />
+    <property name="build.src" value="/cas-6023/examples/client_only/src" />
     <property name="build.dir" value="${basedir}/build" />
     <property name="build.classes" value="${build.dir}/classes" />
     <property name="final.name" value="client_only" />
 
     <path id="build.classpath">
         <!-- cassandra dependencies -->
-        <fileset dir="${cassandra.dir.lib}">
+        <fileset dir="../../lib">
             <include name="**/*.jar" />
         </fileset>
-        <fileset dir="${cassandra.dir}/build/lib/jars">
+        <fileset dir="../../build/lib/jars">
             <include name="**/*.jar" />
         </fileset>
-        <pathelement location="${cassandra.classes}" />
+        <pathelement location="../../build/classes/main" />
     </path>
 
     <target name="init">
@@ -53,14 +53,14 @@
         <mkdir dir="${build.classes}/META-INF" />
         <jar jarfile="${build.dir}/${final.name}.jar">
            <fileset dir="${build.classes}" />
-           <fileset dir="${cassandra.classes}" />
-           <fileset dir="${cassandra.dir}">
+           <fileset dir="../../build/classes/main" />
+           <fileset dir="../..">
                <include name="lib/**/*.jar" />
            </fileset>
-           <zipfileset dir="${cassandra.dir}/build/lib/jars/" prefix="lib">
+           <zipfileset dir="../../build/lib/jars/" prefix="lib">
                <include name="**/*.jar" />
            </zipfileset>
-           <fileset file="${basedir}/conf/cassandra.yaml" />
+           <fileset file="/cas-6023/examples/client_only/conf/cassandra.yaml" />
         </jar>
     </target>
 
